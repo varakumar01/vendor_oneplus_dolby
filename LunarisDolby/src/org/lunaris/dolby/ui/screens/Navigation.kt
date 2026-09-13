@@ -5,26 +5,35 @@
 
 package org.lunaris.dolby.ui.screens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
+import org.lunaris.dolby.ui.components.FloatingNavToolbar
 import org.lunaris.dolby.ui.viewmodel.AppProfileViewModel
 import org.lunaris.dolby.ui.viewmodel.DolbyViewModel
 import org.lunaris.dolby.ui.viewmodel.EqualizerViewModel
-
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.foundation.layout.fillMaxSize
 
 sealed class Screen(val route: String) {
     object Settings : Screen("settings")
@@ -34,36 +43,89 @@ sealed class Screen(val route: String) {
     object ImportExport : Screen("import_export")
 }
 
-val bottomBarRoutes = listOf(Screen.Settings.route, Screen.Equalizer.route, Screen.Advanced.route)
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun MainPagerScreen(
+    dolbyViewModel: DolbyViewModel,
+    equalizerViewModel: EqualizerViewModel,
+    navController: NavController
+) {
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        pageCount = { 3 }
+    )
+    val coroutineScope = rememberCoroutineScope()
 
-fun Modifier.horizontalSwipeNavigator(
-    currentRoute: String?,
-    destinations: List<String>,
-    onNavigate: (Int) -> Unit
-): Modifier = pointerInput(currentRoute) {
-    var totalDrag = 0f
-    detectHorizontalDragGestures(
-        onDragStart = { totalDrag = 0f },
-        onHorizontalDrag = { change, dragAmount ->
-            change.consume()
-            totalDrag += dragAmount
-        },
-        onDragEnd = {
-            val threshold = 150f
-            if (kotlin.math.abs(totalDrag) > threshold) {
-                val currentIndex = destinations.indexOf(currentRoute)
-                if (currentIndex == -1) return@detectHorizontalDragGestures
+    val currentFakeRoute = when (pagerState.currentPage) {
+        0 -> "settings"
+        1 -> "equalizer"
+        2 -> "advanced"
+        else -> "settings"
+    }
 
-                if (totalDrag < 0) {
-                    val next = (currentIndex + 1).coerceAtMost(destinations.lastIndex)
-                    if (next != currentIndex) onNavigate(next)
-                } else {
-                    val prev = (currentIndex - 1).coerceAtLeast(0)
-                    if (prev != currentIndex) onNavigate(prev)
-                }
+    LaunchedEffect(pagerState.settledPage) {
+        if (pagerState.settledPage == 1) {
+            equalizerViewModel.loadEqualizer()
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { page ->
+            when (page) {
+                0 -> ModernDolbySettingsScreen(
+                    viewModel = dolbyViewModel,
+                    navController = navController
+                )
+                1 -> ModernEqualizerScreen(
+                    viewModel = equalizerViewModel,
+                    navController = navController
+                )
+                2 -> ModernAdvancedSettingsScreen(
+                    viewModel = dolbyViewModel,
+                    navController = navController
+                )
             }
         }
-    )
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .height(130.dp)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            MaterialTheme.colorScheme.surfaceContainer
+                        )
+                    )
+                )
+        )
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .safeDrawingPadding(),
+            contentAlignment = Alignment.Center
+        ) {
+            FloatingNavToolbar(
+                currentRoute = currentFakeRoute,
+                onNavigate = { route ->
+                    coroutineScope.launch {
+                        when (route) {
+                            "settings" -> pagerState.animateScrollToPage(0)
+                            "equalizer" -> pagerState.animateScrollToPage(1)
+                            "advanced" -> pagerState.animateScrollToPage(2)
+                        }
+                    }
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -72,117 +134,15 @@ fun DolbyNavHost(
     equalizerViewModel: EqualizerViewModel
 ) {
     val navController = rememberNavController()
-    val currentBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = currentBackStackEntry?.destination?.route
-
-    val hostModifier = Modifier
-        .fillMaxSize()
-        .horizontalSwipeNavigator(
-            currentRoute = currentRoute,
-            destinations = bottomBarRoutes,
-            onNavigate = { index ->
-                navController.navigate(bottomBarRoutes[index]) {
-                    popUpTo(Screen.Settings.route) { saveState = true }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            }
-        )
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Settings.route,
-        modifier = hostModifier,
-        enterTransition = {
-            val targetRoute = targetState.destination.route
-            val initialRoute = initialState.destination.route
-            val targetIndex = bottomBarRoutes.indexOf(targetRoute)
-            val initialIndex = bottomBarRoutes.indexOf(initialRoute)
-
-            when {
-                targetIndex != -1 && initialIndex != -1 -> {
-                    val offsetSign = if (targetIndex > initialIndex) 1 else -1
-                    slideInHorizontally(initialOffsetX = { it * offsetSign }, animationSpec = tween(300))
-                }
-                targetRoute in bottomBarRoutes && initialRoute !in bottomBarRoutes -> {
-                    slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(300))
-                }
-                else -> slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(300))
-            }
-        },
-        exitTransition = {
-            val targetRoute = targetState.destination.route
-            val initialRoute = initialState.destination.route
-            val targetIndex = bottomBarRoutes.indexOf(targetRoute)
-            val initialIndex = bottomBarRoutes.indexOf(initialRoute)
-
-            when {
-                targetIndex != -1 && initialIndex != -1 -> {
-                    val offsetSign = if (targetIndex > initialIndex) -1 else 1
-                    slideOutHorizontally(targetOffsetX = { it * offsetSign }, animationSpec = tween(300))
-                }
-                initialRoute in bottomBarRoutes && targetRoute !in bottomBarRoutes -> {
-                    slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(300))
-                }
-                else -> slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(300))
-            }
-        },
-        popEnterTransition = {
-            val targetRoute = targetState.destination.route
-            val initialRoute = initialState.destination.route
-            val targetIndex = bottomBarRoutes.indexOf(targetRoute)
-            val initialIndex = bottomBarRoutes.indexOf(initialRoute)
-
-            when {
-                targetIndex != -1 && initialIndex != -1 -> {
-                    val offsetSign = if (targetIndex > initialIndex) 1 else -1
-                    slideInHorizontally(initialOffsetX = { it * offsetSign }, animationSpec = tween(300))
-                }
-                targetRoute in bottomBarRoutes -> {
-                    slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(300))
-                }
-                else -> slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(300))
-            }
-        },
-        popExitTransition = {
-            val targetRoute = targetState.destination.route
-            val initialRoute = initialState.destination.route
-            val targetIndex = bottomBarRoutes.indexOf(targetRoute)
-            val initialIndex = bottomBarRoutes.indexOf(initialRoute)
-
-            when {
-                targetIndex != -1 && initialIndex != -1 -> {
-                    val offsetSign = if (targetIndex > initialIndex) -1 else 1
-                    slideOutHorizontally(targetOffsetX = { it * offsetSign }, animationSpec = tween(300))
-                }
-                initialRoute !in bottomBarRoutes -> {
-                    slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(300))
-                }
-                else -> slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(300))
-            }
-        }
+        startDestination = "main_pager"
     ) {
-        composable(Screen.Settings.route) {
-            ModernDolbySettingsScreen(
-                viewModel = dolbyViewModel,
-                navController = navController
-            )
-        }
-
-        composable(Screen.Equalizer.route) {
-            LaunchedEffect(Unit) {
-                equalizerViewModel.loadEqualizer()
-            }
-            
-            ModernEqualizerScreen(
-                viewModel = equalizerViewModel,
-                navController = navController
-            )
-        }
-
-        composable(Screen.Advanced.route) {
-            ModernAdvancedSettingsScreen(
-                viewModel = dolbyViewModel,
+        composable("main_pager") {
+            MainPagerScreen(
+                dolbyViewModel = dolbyViewModel,
+                equalizerViewModel = equalizerViewModel,
                 navController = navController
             )
         }
