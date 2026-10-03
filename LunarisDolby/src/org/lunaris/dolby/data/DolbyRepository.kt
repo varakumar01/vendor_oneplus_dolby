@@ -121,9 +121,17 @@ class DolbyRepository(private val context: Context) : AutoCloseable {
     }
 
     fun applySavedState() {
-    checkEffect()
+        checkEffect()
         val enabled = defaultPrefs.getBoolean(DolbyConstants.PREF_ENABLE, false)
-        dolbyEffect.dsOn = enabled
+        try {
+            dolbyEffect.dsOn = enabled
+        } catch (e: Exception) {
+            // The effect HAL can reject the parameter write while audio is still coming up
+            // (UnsupportedOperationException from AudioEffect.checkStatus); the next device or
+            // playback callback calls this again.
+            DolbyConstants.dlog(TAG, "Failed to apply saved state: ${e.message}")
+            return
+        }
         if (enabled) {
             restoreSavedProfileIfNeeded()
         }
