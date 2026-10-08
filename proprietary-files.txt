@@ -9,17 +9,6 @@ vendor/etc/media_codecs_dolby_audio.xml
 vendor/etc/vintf/manifest/vendor.dolby.hardware.dms.xml
 vendor/etc/vintf/manifest/vendor.dolby.media.c2@1.0-service.xml
 
-# Vendor Libraries
-vendor/lib/libdapparamstorage.so
-vendor/lib/libdlbpreg.so
-vendor/lib/vendor.dolby.hardware.dms@2.0.so
-
-# Vendor SoundFX Libraries
-vendor/lib/soundfx/libdlbvol.so
-vendor/lib/soundfx/libswdap.so|aedcc8cade96ba9d7a8b4f633f001a6976b23510|0dded004fcf5295786d5ea7a274446d4f6634722
-vendor/lib/soundfx/libswgamedap.so
-vendor/lib/soundfx/libswvqe.so
-
 # 64-bit Vendor Libraries
 vendor/lib64/libcodec2_soft_ac4dec.so
 vendor/lib64/libcodec2_soft_ddpdec.so
