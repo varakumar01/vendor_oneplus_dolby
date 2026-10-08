@@ -8,9 +8,12 @@ $(call inherit-product, vendor/sony/dolby/dolby-vendor.mk)
 
 DOLBY_PATH := vendor/sony/dolby
 
-# Configs
+# Configs: dax-default-<device>.xml when the device has its own speaker tuning
+DOLBY_DAX_XML := $(firstword $(wildcard $(DOLBY_PATH)/configs/dolby/dax-default-$(patsubst lineage_%,%,$(TARGET_PRODUCT)).xml) \
+    $(DOLBY_PATH)/configs/dolby/dax-default.xml)
+
 PRODUCT_COPY_FILES += \
-    $(DOLBY_PATH)/configs/dolby/dax-default.xml:$(TARGET_COPY_OUT_VENDOR)/etc/dolby/dax-default.xml
+    $(DOLBY_DAX_XML):$(TARGET_COPY_OUT_VENDOR)/etc/dolby/dax-default.xml
 
 # Dolby
 PRODUCT_PACKAGES += \
