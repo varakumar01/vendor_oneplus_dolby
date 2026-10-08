@@ -35,3 +35,12 @@ vendor/etc/init/vendor.dolby.media.c2@1.0-service.rc
 # Dolby Binaries
 vendor/bin/hw/vendor.dolby.hardware.dms@2.0-service
 vendor/bin/hw/vendor.dolby.media.c2@1.0-service
+
+# Dolby spatializer - from Motorola rtwo (user-13-T1TR33.43-20-28-8fa75-release-keys),
+# as renamed in userariii/vendor_motorola_dolby@android-15
+vendor/lib64/libdapparamstorage-v33_rtwo.so|ce33cc535b0b07f4c53158f2c1ce3ea02d8df4fc
+vendor/lib64/libspatializerparamstorage.so|f18b216bb8bb6f90d93f2b3181115e257a878e7f
+vendor/lib64/libstagefright_foundation-v33_rtwo.so|5c0931175d4f9eb96bc1ef39506857dbe755cf5e
+vendor/lib64/vendor.dolby.hardware.dms@2.0-v33_rtwo.so|543ed3c69d6d20cfa4278c1183373c2741d2bb42
+vendor/lib64/libswdap-v33_rtwo.so|d05092cda336b9a7ab3835041435097bfde69c2e
+vendor/lib64/soundfx/libswspatializer.so|881f696f21b8a20bef80835443ff6bad2d9f96fc
