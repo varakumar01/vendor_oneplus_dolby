@@ -15,22 +15,21 @@ PRODUCT_PACKAGES += \
     libcodec2_soft_ddpdec \
     libcodec2_soft_dolby \
     libcodec2_store_dolby \
-    libdapparamstorage-v33_rtwo \
+    libdapparamstorage-spatial \
     libdapparamstorage \
     libdeccfg \
     libdlbdsservice \
     libdlbpreg \
     liboem_specific \
     libspatializerparamstorage \
-    libstagefright_foundation-v33_rtwo \
-    libswdap-v33_rtwo \
+    libstagefright_foundation-spatial \
     libdlbvol \
     libswdap \
     libswgamedap \
     libswspatializer \
     libswvqe \
     vendor.dolby.hardware.dms@2.0-impl \
-    vendor.dolby.hardware.dms@2.0-v33_rtwo \
+    vendor.dolby.hardware.dms@2.0-spatial \
     vendor.dolby.hardware.dms@2.0 \
     vendor.dolby.hardware.dms.xml \
     vendor.dolby.media.c2@1.0-service.xml \

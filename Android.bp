@@ -138,7 +138,7 @@ cc_prebuilt_library_shared {
 }
 
 cc_prebuilt_library_shared {
-    name: "libdapparamstorage-v33_rtwo",
+    name: "libdapparamstorage-spatial",
     owner: "sony",
     strip: {
         none: true,
@@ -146,7 +146,7 @@ cc_prebuilt_library_shared {
     target: {
         android_arm64: {
             srcs: [
-                "proprietary/vendor/lib64/libdapparamstorage-v33_rtwo.so",
+                "proprietary/vendor/lib64/libdapparamstorage-spatial.so",
             ],
             shared_libs: [
                 "libcutils",
@@ -335,7 +335,7 @@ cc_prebuilt_library_shared {
 }
 
 cc_prebuilt_library_shared {
-    name: "libstagefright_foundation-v33_rtwo",
+    name: "libstagefright_foundation-spatial",
     owner: "sony",
     strip: {
         none: true,
@@ -343,47 +343,13 @@ cc_prebuilt_library_shared {
     target: {
         android_arm64: {
             srcs: [
-                "proprietary/vendor/lib64/libstagefright_foundation-v33_rtwo.so",
+                "proprietary/vendor/lib64/libstagefright_foundation-spatial.so",
             ],
             shared_libs: [
                 "libbinder",
                 "libutils",
                 "libcutils",
                 "liblog",
-                "libc++",
-                "libc",
-                "libm",
-                "libdl",
-            ],
-        },
-    },
-    compile_multilib: "64",
-    prefer: true,
-    soc_specific: true,
-}
-
-cc_prebuilt_library_shared {
-    name: "libswdap-v33_rtwo",
-    owner: "sony",
-    strip: {
-        none: true,
-    },
-    target: {
-        android_arm64: {
-            srcs: [
-                "proprietary/vendor/lib64/libswdap-v33_rtwo.so",
-            ],
-            shared_libs: [
-                "libspatializerparamstorage",
-                "liblog",
-                "libutils",
-                "libcutils",
-                "libaudioutils",
-                "libdapparamstorage-v33_rtwo",
-                "libhidlbase",
-                "libstagefright_foundation-v33_rtwo",
-                "libdlbpreg",
-                "vendor.dolby.hardware.dms@2.0-v33_rtwo",
                 "libc++",
                 "libc",
                 "libm",
@@ -506,17 +472,18 @@ cc_prebuilt_library_shared {
                 "proprietary/vendor/lib64/soundfx/libswspatializer.so",
             ],
             shared_libs: [
-                "libswdap-v33_rtwo",
+                "libdlbvol",
+                "libswdap",
                 "liblog",
                 "libutils",
                 "libcutils",
                 "libaudioutils",
-                "libdapparamstorage-v33_rtwo",
+                "libdapparamstorage-spatial",
                 "libspatializerparamstorage",
                 "libhidlbase",
-                "libstagefright_foundation-v33_rtwo",
+                "libstagefright_foundation-spatial",
                 "libdlbpreg",
-                "vendor.dolby.hardware.dms@2.0-v33_rtwo",
+                "vendor.dolby.hardware.dms@2.0-spatial",
                 "libc++",
                 "libc",
                 "libm",
@@ -593,7 +560,7 @@ cc_prebuilt_library_shared {
 }
 
 cc_prebuilt_library_shared {
-    name: "vendor.dolby.hardware.dms@2.0-v33_rtwo",
+    name: "vendor.dolby.hardware.dms@2.0-spatial",
     owner: "sony",
     strip: {
         none: true,
@@ -601,7 +568,7 @@ cc_prebuilt_library_shared {
     target: {
         android_arm64: {
             srcs: [
-                "proprietary/vendor/lib64/vendor.dolby.hardware.dms@2.0-v33_rtwo.so",
+                "proprietary/vendor/lib64/vendor.dolby.hardware.dms@2.0-spatial.so",
             ],
             shared_libs: [
                 "libhidlbase",

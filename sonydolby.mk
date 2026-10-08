@@ -13,7 +13,8 @@ DOLBY_DAX_XML := $(firstword $(wildcard $(DOLBY_PATH)/configs/dolby/dax-default-
     $(DOLBY_PATH)/configs/dolby/dax-default.xml)
 
 PRODUCT_COPY_FILES += \
-    $(DOLBY_DAX_XML):$(TARGET_COPY_OUT_VENDOR)/etc/dolby/dax-default.xml
+    $(DOLBY_DAX_XML):$(TARGET_COPY_OUT_VENDOR)/etc/dolby/dax-default.xml \
+    $(DOLBY_PATH)/configs/dolby/dax-default-spatializer.xml:$(TARGET_COPY_OUT_VENDOR)/etc/dolby/dax-default-spatializer.xml
 
 # Dolby
 PRODUCT_PACKAGES += \
